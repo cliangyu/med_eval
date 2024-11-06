@@ -211,8 +211,7 @@ def main():
     if dataset is None:
         raise ValueError(f"Invalid dataset name: {args.dataset_name}")
     dataset = load_dataset(dataset, split='test')
-    dataset = dataset.select(range(100))
-    
+    # dataset = dataset.select(range(100)) # for debug
     # Initialize vLLM
     llm = LLM(
         model=args.model_id_or_path,
