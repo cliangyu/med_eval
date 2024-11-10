@@ -212,6 +212,11 @@ def main():
         raise ValueError(f"Invalid dataset name: {args.dataset_name}")
     dataset = load_dataset(dataset, split='test')
     # dataset = dataset.select(range(100)) # for debug
+    
+    # if dataset is ubench, keep only large images
+    if args.dataset_name == 'ubench':
+        dataset = dataset.filter(lambda x: x['image'].size[0] * x['image'].size[1] > 1000000)
+    
     # Initialize vLLM
     llm = LLM(
         model=args.model_id_or_path,
