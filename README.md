@@ -43,15 +43,8 @@ For uBench, each instance is a dictionary with multiple choice questions.
 ```
 # output the answer to a file and then evaluate the answer file in eval.py
 cd ..
-CUDA_VISIBLE_DEVICES=8 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /home/yutong/.cache/modelscope/hub/qwen/Qwen2-VL-2B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
-CUDA_VISIBLE_DEVICES=8 python -m med_eval.infer_eval  --dataset_name ubench --model_id_or_path /home/yutong/.cache/modelscope/hub/qwen/Qwen2-VL-2B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
-CUDA_VISIBLE_DEVICES=8 python -m med_eval.infer_eval  --dataset_name slake --model_id_or_path /home/yutong/.cache/modelscope/hub/qwen/Qwen2-VL-2B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
-CUDA_VISIBLE_DEVICES=8 python -m med_eval.infer_eval  --dataset_name path-vqa --model_id_or_path /home/yutong/.cache/modelscope/hub/qwen/Qwen2-VL-2B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
-CUDA_VISIBLE_DEVICES=9 python -m med_eval.infer_eval  --dataset_name ubench --model_id_or_path /home/yutong/.cache/modelscope/hub/qwen/Qwen2-VL-7B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl 
-
-
-
-
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval_subcellular --model_id_or_path /pasteur/u/liangyuc/code/swift/output/qwen2-vl-2b-instruct/v43-20241109-223139/checkpoint-154 --test_file /pasteur2/u/liangyuc/data/llava_med/subcellular_test.jsonl --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name ubench --model_id_or_path /pasteur/u/liangyuc/code/swift/output/qwen2-vl-2b-instruct/v30-20241103-234014/checkpoint-901 --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
 CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /pasteur/u/liangyuc/code/swift/output/qwen2-vl-2b-instruct/v32-20241104-201714/checkpoint-1802 --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
 
 CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /sailhome/liangyuc/.cache/modelscope/hub/qwen/Qwen2-VL-2B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
