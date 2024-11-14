@@ -1,4 +1,5 @@
 # infer_eval.py
+
 import argparse
 import json
 from datasets import load_dataset
@@ -13,13 +14,15 @@ def parse_args():
     parser.add_argument("--dataset_name", type=str, required=True, 
                       choices=['vqa-rad', 'path-vqa', 'slake', 'ubench'])
     parser.add_argument("--model_id_or_path", type=str, required=True)
-    parser.add_argument("--output_file", type=str, required=True)
+    parser.add_argument("--output_file", type=str, default=None,
+                       help="Output file path. If not specified, will use model_id_or_path directory")
     parser.add_argument("--batch_size", type=int, default=32,
                        help="Batch size for inference")
     parser.add_argument("--min_pixels", type=int, default=28 * 28,
                        help="Minimum number of pixels for image processing")
     parser.add_argument("--max_pixels", type=int, default=1280 * 28 * 28,
                        help="Maximum number of pixels for image processing")
+    parser.add_argument("--whole_dataset", action='store_true', help="Use the whole dataset")
     return parser.parse_args()
 
 def is_yes_no_question(answer):
@@ -47,7 +50,7 @@ def evaluate_predictions(predictions):
             f1, _, recall = calculate_f1score(pred_answer, gt_answer)
             open_ended_f1_sum += f1
             open_ended_recall_sum += recall
-
+    
     results = {
         'total': total,
         'closed_ended': {
@@ -120,15 +123,24 @@ def process_mcq_batch(llm, batch_items):
     
     for item in batch_items:
         image = item['image'].convert('RGB') if item['image'].mode != 'RGB' else item['image']
-        questions = item['questions']
+        questions = item.get('questions', {})
         
         for q_type, q_data in questions.items():
-            options = format_mcq_options(q_data['options'])
+            if q_data is None:
+                # Skip this question type as q_data is null
+                continue
+
+            options = q_data.get('options')
+            if not options:
+                # Skip if options are missing or empty
+                continue
+
+            formatted_options = format_mcq_options(options)
             prompt = ("<|im_start|>system\nYou are a biomedical expert.<|im_end|>\n"
                      "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>\n"
                      "Answer with a single letter, no extra details.\n"
                      f"Question: {q_data['question']}\n"
-                     f"{chr(10).join(options)}<|im_end|>\n"
+                     f"{chr(10).join(formatted_options)}<|im_end|>\n"
                      "<|im_start|>assistant\n")
             
             inputs.append({
@@ -142,6 +154,10 @@ def process_mcq_batch(llm, batch_items):
                 "correct_letter": get_correct_letter(q_data['answer_idx']),
                 "options": q_data['options']
             })
+
+    if not inputs:
+        # No valid questions in this batch
+        return []
 
     # Generate responses using vLLM
     sampling_params = SamplingParams(temperature=0.2, max_tokens=128)
@@ -200,6 +216,13 @@ def evaluate_mcq_predictions(predictions):
 def main():
     args = parse_args()
     
+    # Set default output file path if not specified
+    if args.output_file is None:
+        import os
+        base_dir = os.path.dirname(args.model_id_or_path.rstrip('/'))
+        filename = f"{args.dataset_name}_{args.max_pixels}.jsonl"
+        args.output_file = os.path.join(args.model_id_or_path, filename)
+    
     # Load dataset
     dataset_map = {
         'ubench': ('jnirschl/uBench', True),
@@ -207,14 +230,15 @@ def main():
         'path-vqa': ('flaviagiammarino/path-vqa', False),
         'slake': ('mdwiratathya/SLAKE-vqa-english', False)
     }
-    dataset, is_mcq = dataset_map.get(args.dataset_name, (None, None))
-    if dataset is None:
+    dataset_info = dataset_map.get(args.dataset_name, (None, None))
+    if dataset_info == (None, None):
         raise ValueError(f"Invalid dataset name: {args.dataset_name}")
+    dataset, is_mcq = dataset_info
     dataset = load_dataset(dataset, split='test')
     # dataset = dataset.select(range(100)) # for debug
     
     # if dataset is ubench, keep only large images
-    if args.dataset_name == 'ubench':
+    if args.dataset_name == 'ubench' and not args.whole_dataset:
         dataset = dataset.filter(lambda x: x['image'].size[0] * x['image'].size[1] > 1000000)
     
     # Initialize vLLM
@@ -245,14 +269,15 @@ def main():
             responses = process_mcq_batch(llm, batch)
         else:
             responses = process_batch(llm, batch)
-        predictions.extend(responses)
-        write_results(responses, args.output_file)
-
+        if responses:
+            predictions.extend(responses)
+            write_results(responses, args.output_file)
+    
     # Calculate and print results
     if is_mcq:
         results = evaluate_mcq_predictions(predictions)
         print("\nResults:")
-        print(f"Total examples: {results['total']}")
+        print(f"Total questions: {results['total']}")
         print(f"Overall accuracy: {results['overall_accuracy']*100:.2f}%")
         print("\nResults by question type:")
         for qtype, metrics in results['by_type'].items():
