@@ -9,6 +9,7 @@ from vllm import LLM, SamplingParams
 from vllm.assets.image import ImageAsset
 from torch.utils.data import DataLoader
 import os
+from transformers import AutoTokenizer
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -66,17 +67,20 @@ def evaluate_predictions(predictions):
     }
     return results
 
-def process_batch(llm, batch_items):
+def process_batch(llm, batch_items, tokenizer):
     # Prepare batch inputs for vLLM
     inputs = []
     for item in batch_items:
         # Convert image to RGB if it isn't already
         image = item['image'].convert('RGB') if item['image'].mode != 'RGB' else item['image']
         
-        prompt = ("<|im_start|>system\nYou are a biomedical expert.<|im_end|>\n"
-                 "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>"
-                 f"{item['question']}<|im_end|>\n"
-                 "<|im_start|>assistant\n")
+        messages = [{'role': 'user', 'content': f"<image>\n{item['question']}"}]
+                
+        prompt = tokenizer.apply_chat_template(messages,
+                                           tokenize=False,
+                                           add_generation_prompt=True)
+        
+        # print(prompt)
         
         inputs.append({
             "prompt": prompt,
@@ -266,12 +270,15 @@ def main():
         collate_fn=custom_collate
     )
     
+    tokenizer = AutoTokenizer.from_pretrained(args.model_id_or_path,
+                                              trust_remote_code=True)
+    
     predictions = []
     for batch in tqdm(dataloader, desc="Running inference"):
         if is_mcq:
             responses = process_mcq_batch(llm, batch)
         else:
-            responses = process_batch(llm, batch)
+            responses = process_batch(llm, batch, tokenizer)
         if responses:
             predictions.extend(responses)
             write_results(responses, args.output_file)

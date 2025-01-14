@@ -43,14 +43,54 @@ For uBench, each instance is a dictionary with multiple choice questions.
 ```
 # output the answer to a file and then evaluate the answer file in eval.py
 cd ..
-CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval_subcellular --model_id_or_path /pasteur/u/liangyuc/code/swift/output/qwen2-vl-2b-instruct/v43-20241109-223139/checkpoint-154 --test_file /pasteur2/u/liangyuc/data/llava_med/subcellular_test.jsonl --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval_subcellular --model_id_or_path /mnt/disks/persistent-disk/code/swift/output/llava-onevision-qwen2-0_5b-ov/v12-20241204-034303/checkpoint-123 --max_pixels 50176
 CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name ubench --model_id_or_path /pasteur/u/liangyuc/code/swift/output/qwen2-vl-2b-instruct/v30-20241103-234014/checkpoint-901 --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
-CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /pasteur/u/liangyuc/code/swift/output/qwen2-vl-2b-instruct/v32-20241104-201714/checkpoint-1802 --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /home/ly/.cache/modelscope/hub/qwen/Qwen2-VL-7B-Instruct --max_pixels 50176
 
-CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /sailhome/liangyuc/.cache/modelscope/hub/qwen/Qwen2-VL-2B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
-CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /sailhome/liangyuc/.cache/modelscope/hub/qwen/Qwen2-VL-2B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl 
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /mnt/disks/persistent-disk/code/output/InternVL2_5-4B/v6-20241219-052230/checkpoint-13 --batch_size 1
 
-CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name path-vqa --model_id_or_path /pasteur/u/liangyuc/code/swift/output/qwen2-vl-2b-instruct/v29-20241102-164048/checkpoint-1902 --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 50176
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v20-20241206-095923/checkpoint-4757 --max_pixels 1000000 
+CUDA_VISIBLE_DEVICES=1 python -m med_eval.infer_eval  --dataset_name path-vqa --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v20-20241206-095923/checkpoint-4757 --max_pixels 1000000
+CUDA_VISIBLE_DEVICES=2 python -m med_eval.infer_eval  --dataset_name slake --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v20-20241206-095923/checkpoint-4757 --max_pixels 1000000
+CUDA_VISIBLE_DEVICES=1 python -m med_eval.infer_eval  --dataset_name path-vqa --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v14-20241206-010529/checkpoint-1000 --max_pixels 1000000
+CUDA_VISIBLE_DEVICES=2 python -m med_eval.infer_eval  --dataset_name slake --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v14-20241206-010529/checkpoint-1000 --max_pixels 1000000
+CUDA_VISIBLE_DEVICES=1 python -m med_eval.infer_eval  --dataset_name slake --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v14-20241206-010529/checkpoint-1000 --max_pixels 50176
+'CUDA_VISIBLE_DEVICES=3 python -m med_eval.infer_eval  --dataset_name ubench --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-7b-instruct/v8-20241118-223800/checkpoint-306
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /sailhome/liangyuc/.cache/modelscope/hub/qwen/Qwen2-VL-2B-Instruct --output_file answer-file-qwen2-vl-2b-instruct.jsonl
+
+CUDA_VISIBLE_DEVICES=3 python -m med_eval.infer_eval  --dataset_name vqa-rad --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-2b-instruct/v22-20241123-222820/checkpoint-1224
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name path-vqa --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-7b-instruct/v14-20241120-013332/checkpoint-486
+CUDA_VISIBLE_DEVICES=1 python -m med_eval.infer_eval  --dataset_name slake --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-7b-instruct/v14-20241120-013332/checkpoint-486
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name path-vqa --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-7b-instruct/v14-20241120-013332/checkpoint-486
+
+CUDA_VISIBLE_DEVICES=3 python -m med_eval.eval_hussain --model_id_or_path /mnt/disks/persistent-disk/code/swift/output/qwen2-vl-7b-instruct/v12-20241119-231240/checkpoint-63 --max_pixels 50176
+
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-7b-instruct/v18-20241121-024730/checkpoint-105
+CUDA_VISIBLE_DEVICES=1 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-7b-instruct/v18-20241121-024730/checkpoint-105 --max_pixels 50176
+CUDA_VISIBLE_DEVICES=2 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-7b-instruct/v19-20241121-034437/checkpoint-105
+CUDA_VISIBLE_DEVICES=3 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-7b-instruct/v19-20241121-034437/checkpoint-105 --max_pixels 50176
+
+# eval wsi vqa
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.eval_hussain --model_id_or_path /pasteur2/u/liangyuc/code/output/qwen2-vl-2b-instruct/v3-20250112-174415/checkpoint-442 --max_pixels 50176 --hussain_file /pasteur2/u/liangyuc/data/brca_json/WsiVQA_test_shuffled_subtype.jsonl --output_file /pasteur2/u/liangyuc/code/output/qwen2-vl-2b-instruct/v3-20250112-174415/checkpoint-442/output_eval.jsonl
+CUDA_VISIBLE_DEVICES=1 python -m med_eval.eval_hussain --model_id_or_path /pasteur2/u/liangyuc/code/output/qwen2-vl-2b-instruct/v2-20250112-150028/checkpoint-442/ --max_pixels 50176 --hussain_file /pasteur2/u/liangyuc/data/brca_json/WsiVQA_test_shuffled_subtype.jsonl --output_file /pasteur2/u/liangyuc/code/output/qwen2-vl-2b-instruct/v2-20250112-150028/checkpoint-442/output_eval.jsonl
+
+  /pasteur2/u/liangyuc/code/output/qwen2-vl-2b-instruct/v2-20250112-150028/checkpoint-442/
+
+
+CUDA_VISIBLE_DEVICES=3 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-2b-instruct/v59-20241121-073714/checkpoint-1323 --max_pixels 50176 --hussain_file /home/ly/d/data/brca_json/WsiVQA_test_shuffled.jsonl
+CUDA_VISIBLE_DEVICES=2 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-2b-instruct/v59-20241121-073714/checkpoint-1323 --max_pixels 50176 --hussain_file /home/ly/d/data/brca_json/WsiVQA_test_shuffled.jsonl --max_pixels 50176
+CUDA_VISIBLE_DEVICES=2 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-2b-instruct/v56-20241121-055610/checkpoint-500 --max_pixels 50176 --hussain_file /home/ly/d/data/brca_json/WsiVQA_test_shuffled.jsonl --max_pixels 50176
+# bbbc
+CUDA_VISIBLE_DEVICES=2 python -m med_eval.eval_hussain --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v30-20241211-224739/checkpoint-780 --hussain_file /home/ly/d/data/bbbc_rgb/bbbc021_test.jsonl --max_pixels 50176
+CUDA_VISIBLE_DEVICES=3 python -m med_eval.eval_hussain --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v30-20241211-224739/checkpoint-780 --hussain_file /home/ly/d/data/bbbc_rgb/bbbc021_test.jsonl --max_pixels 50176
+CUDA_VISIBLE_DEVICES=3 python -m med_eval.eval_hussain --model_id_or_path  /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v19-20241206-074333/checkpoint-1560 --hussain_file /home/ly/d/data/bbbc_rgb/bbbc021_test.jsonl --max_pixels 50176
+
+CUDA_VISIBLE_DEVICES=2 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-2b-instruct/v1-20241204-222716/checkpoint-441 --hussain_file /home/ly/d/data/brca_json/WsiVQA_test_shuffled.jsonl --max_pixels 50176 --batch_size 1
+CUDA_VISIBLE_DEVICES=3 python -m med_eval.eval_hussain --model_id_or_path /home/ly/d/code/swift/output/qwen2-vl-2b-instruct/v1-20241204-222716/checkpoint-441 --hussain_file /home/ly/d/data/brca_json/WsiVQA_test_shuffled.jsonl --batch_size 2
+
+
+
+CUDA_VISIBLE_DEVICES=0 python -m med_eval.eval_hussain --model_id_or_path /mnt/disks/persistent-disk/code/output/Qwen2-VL-2B-Instruct/v18-20241206-071821/checkpoint-1565 --max_pixels 50176
 CUDA_VISIBLE_DEVICES=0 python -m med_eval.infer_eval  --dataset_name path-vqa --model_id_or_path /pasteur/u/liangyuc/code/swift/output/qwen2-vl-2b-instruct/v27-20241027-115543/checkpoint-1802 --output_file answer-file-qwen2-vl-2b-instruct.jsonl --max_pixels 12845056
 
 # evaluate the saved answer file to get the results

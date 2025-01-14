@@ -11,8 +11,9 @@ from PIL import Image
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--model_id_or_path", type=str, required=True)
-    parser.add_argument("--output_file", type=str, required=True)
-    parser.add_argument("--test_file", type=str, default="subcellular_test.jsonl")
+    parser.add_argument("--output_file", type=str, default=None,
+                       help="Output file path. If not specified, will use model_id_or_path directory")
+    parser.add_argument("--test_file", type=str, default="/home/ly/d/data/subcellular/subcellular_test.jsonl")
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--min_pixels", type=int, default=28 * 28)
     parser.add_argument("--max_pixels", type=int, default=1280 * 28 * 28)
@@ -39,7 +40,7 @@ def extract_cell_line_and_localizations(text, all_cell_lines, all_localizations)
     
     return predicted_cell_line, predicted_locs
 
-def process_batch(llm, batch_items, all_cell_lines, all_localizations):
+def process_batch(llm, batch_items, all_cell_lines, all_localizations, model_id_or_path):
     inputs = []
     for item in batch_items:
         # Load and convert image to RGB
@@ -49,10 +50,16 @@ def process_batch(llm, batch_items, all_cell_lines, all_localizations):
             print(f"Error loading image {item['images']}: {e}")
             continue
         
-        prompt = ("<|im_start|>system\nYou are a biomedical expert.<|im_end|>\n"
-                 "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>"
-                 "Describe the cell line and subcellular localizations shown in this image.<|im_end|>\n"
-                 "<|im_start|>assistant\n")
+        # Choose prompt based on model name
+        if "llava" in model_id_or_path.lower():
+            prompt = ("<|im_start|>user <image>\n"
+                     "Describe the cell line and subcellular localizations shown in this image."
+                     "<|im_end|><|im_start|>assistant\n")
+        else:
+            prompt = ("<|im_start|>system\nYou are a biomedical expert.<|im_end|>\n"
+                     "<|im_start|>user\n<|vision_start|><|image_pad|><|vision_end|>"
+                     "Describe the cell line and subcellular localizations shown in this image.<|im_end|>\n"
+                     "<|im_start|>assistant\n")
         
         inputs.append({
             "prompt": prompt,
@@ -78,6 +85,7 @@ def process_batch(llm, batch_items, all_cell_lines, all_localizations):
             'raw_prediction': prediction_text
         })
     return batch_predictions
+
 
 def calculate_recalls(predictions):
     # Cell line recall
@@ -127,6 +135,13 @@ def calculate_recalls(predictions):
 def main():
     args = parse_args()
     
+    # Set default output file path if not specified
+    if args.output_file is None:
+        import os
+        base_dir = os.path.dirname(args.model_id_or_path.rstrip('/'))
+        filename = f"subcellular_{args.max_pixels}.jsonl"
+        args.output_file = os.path.join(args.model_id_or_path, filename)
+    
     # Load test data
     print("Loading test data...")
     test_data = load_jsonl(args.test_file)
@@ -144,7 +159,7 @@ def main():
     # Initialize vLLM
     llm = LLM(
         model=args.model_id_or_path,
-        max_model_len=4096,
+        max_model_len=16384,
         max_num_seqs=32,
         mm_processor_kwargs={
             "min_pixels": args.min_pixels,
@@ -166,7 +181,7 @@ def main():
     
     predictions = []
     for batch in tqdm(dataloader, desc="Running inference"):
-        responses = process_batch(llm, batch, all_cell_lines, all_localizations)
+        responses = process_batch(llm, batch, all_cell_lines, all_localizations, args.model_id_or_path)
         predictions.extend(responses)
         # Write batch results
         with open(args.output_file, 'a') as f:
